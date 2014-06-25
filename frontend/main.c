@@ -201,7 +201,7 @@ setProcessPriority(int Priority)
 
 #if defined(__OS2__)
 /* OS/2 priority functions */
-static void
+void
 setProcessPriority(int Priority)
 {
     int     rc;
