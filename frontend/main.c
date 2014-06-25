@@ -67,6 +67,9 @@ char   *strchr(), *strrchr();
 # include <windows.h>
 #endif
 
+#ifdef __EMX__
+# include <float.h>
+#endif
 
 /*
  main.c is example code for how to use libmp3lame.a.  To use this library,
@@ -476,6 +479,9 @@ c_main(int argc, char *argv[])
 #ifdef __EMX__
     /* This gives wildcard expansion on Non-POSIX shells with OS/2 */
     _wildcard(&argc, &argv);
+
+    /* This prevents SIGFPE */
+    _control87(MCW_EM, MCW_EM);
 #endif
 #if defined( _WIN32 ) && !defined(__MINGW32__)
     set_process_affinity();
