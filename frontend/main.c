@@ -55,6 +55,7 @@ char   *strchr(), *strrchr();
 #endif
 
 #ifdef __OS2__
+#define INCL_DOS
 #include <os2.h>
 #define PRTYC_IDLE 1
 #define PRTYC_REGULAR 2
