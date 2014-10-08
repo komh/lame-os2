@@ -65,10 +65,47 @@ char   *strchr(), *strrchr();
 #include <dmalloc.h>
 #endif
 
-                 
+
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #include <errno.h>
+#endif
+
+#if defined(__KLIBC__) && !defined(iconv_open)
+/* kLIBC iconv_open() does not support UTF-16LE and //TRANSLIT */
+static iconv_t os2_iconv_open (const char *tocode, const char *fromcode)
+{
+    char to[strlen(tocode) + 1];
+    char from[strlen(fromcode) + 1];
+    char *p;
+
+    strcpy(to, tocode);
+    strcpy(from, fromcode);
+
+    if (!strncmp(to, "UTF-16", 6))
+    {
+        strcpy(to, "UCS-2");
+        memmove(to + 5, to + 6, strlen(to + 6));
+    }
+
+    p = strstr(to, "//");
+    if (p)
+        *p = '\0';
+
+    if (!strncmp(from, "UTF-16", 6))
+    {
+        strcpy(from, "UCS-2");
+        memmove(from + 5, from + 6, strlen(from + 6));
+    }
+
+    p = strstr(from, "//");
+    if (p)
+        *p = '\0';
+
+    return iconv_open(to, from);
+}
+
+#define iconv_open(t, f) os2_iconv_open(t, f)
 #endif
 
 #if defined _ALLOW_INTERNAL_OPTIONS
