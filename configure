@@ -5940,6 +5940,7 @@ if test "$ac_res" != no
 then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
+fi
 
 
 case $host_os in
