@@ -19,7 +19,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: brhist.c,v 1.58 2013/06/11 08:41:31 rbrito Exp $ */
+/* $Id$ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
