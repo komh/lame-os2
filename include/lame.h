@@ -1280,7 +1280,7 @@ int CDECL id3tag_set_textinfo_latin1(lame_t gfp, char const *id, char const *tex
 /* experimental */
 int CDECL id3tag_set_comment_latin1(lame_t gfp, char const *lang, char const *desc, char const *text);
 
-#if DEPRECATED_OR_OBSOLETE_CODE_REMOVED
+#if (DEPRECATED_OR_OBSOLETE_CODE_REMOVED && 0)
 #else
 /* experimental */
 int CDECL id3tag_set_textinfo_ucs2(lame_t gfp, char const *id, unsigned short const *text);
