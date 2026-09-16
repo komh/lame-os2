@@ -6,7 +6,7 @@ config() {
   target=i686-pc-os2-emx
 
   export CFLAGS=-Wno-error=incompatible-pointer-types
-  export LDFLAGS=-Zhigh-mem
+  export LDFLAGS="-Zhigh-mem -Wl,-static"
 
   opts="
     --prefix=/@unixroot/usr/local
