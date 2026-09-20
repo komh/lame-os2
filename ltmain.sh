@@ -2935,8 +2935,8 @@ func_resolve_sysroot ()
 # store the result into func_replace_sysroot_result.
 func_replace_sysroot ()
 {
-  case $lt_sysroot:$1 in
-  ?*:"$lt_sysroot"*)
+  case $lt_sysroot$PATH_SEPARATOR$1 in
+  ?*$PATH_SEPARATOR$lt_sysroot*)
     func_stripname "$lt_sysroot" '' "$1"
     func_replace_sysroot_result='='$func_stripname_result
     ;;
@@ -4283,7 +4283,7 @@ func_mode_execute ()
       if eval "test -z \"\$$shlibpath_var\""; then
 	eval "$shlibpath_var=\"\$dir\""
       else
-	eval "$shlibpath_var=\"\$dir:\$$shlibpath_var\""
+	eval "$shlibpath_var=\"\$dir\$PATH_SEPARATOR\$$shlibpath_var\""
       fi
     done
 
@@ -5876,7 +5876,7 @@ func_exec_program ()
 	if test -n "$dllsearchpath"; then
 	  $ECHO "\
     # Add the dll search path components to the executable PATH
-    PATH=$dllsearchpath:\$PATH
+    PATH=\"$dllsearchpath$PATH_SEPARATOR\$PATH\"
 "
 	fi
 
@@ -5888,7 +5888,7 @@ func_exec_program ()
 
     # Some systems cannot cope with colon-terminated $shlibpath_var
     # The second colon is a workaround for a bug in BeOS R4 sed
-    $shlibpath_var=\`\$ECHO \"\$$shlibpath_var\" | $SED 's/::*\$//'\`
+    $shlibpath_var=\`\$ECHO \"\$$shlibpath_var\" | $SED 's/$PATH_SEPARATOR$PATH_SEPARATOR*\$//'\`
 
     export $shlibpath_var
 "
@@ -6099,7 +6099,7 @@ EOF
 	    fi
 
 	    if test -n "$dllsearchpath"; then
-              func_to_host_path "$dllsearchpath:"
+              func_to_host_path "$dllsearchpath$PATH_SEPARATOR"
 	      cat <<EOF
 const char * EXE_PATH_VARNAME = "PATH";
 const char * EXE_PATH_VALUE   = "$func_to_host_path_result";
@@ -6909,7 +6909,15 @@ func_mode_link ()
       # even a static library is built.  For now, we need to specify
       # -no-undefined on the libtool link line when we can be certain
       # that all symbols are satisfied, otherwise we get a static library.
-      allow_undefined=yes
+      case $host in
+      *-*-os2*)
+        # OS/2 does not allow undefined symbols at all when linking a dll.
+        allow_undefined=no
+        ;;
+      *)
+        allow_undefined=yes
+        ;;
+      esac
       ;;
     *)
       allow_undefined=yes
@@ -7408,15 +7416,15 @@ func_mode_link ()
 	case $host in
 	*-*-cygwin* | *-*-mingw* | *-*-windows* | *-*-pw32* | *-*-os2* | *-cegcc*)
 	  testbindir=`$ECHO "$dir" | $SED 's*/lib$*/bin*'`
-	  case :$dllsearchpath: in
-	  *":$dir:"*) ;;
-	  ::) dllsearchpath=$dir;;
-	  *) func_append dllsearchpath ":$dir";;
+	  case $PATH_SEPARATOR$dllsearchpath$PATH_SEPARATOR in
+	  *$PATH_SEPARATOR$dir$PATH_SEPARATOR*) ;;
+	  $PATH_SEPARATOR$PATH_SEPARATOR) dllsearchpath=$dir;;
+	  *) func_append dllsearchpath "$PATH_SEPARATOR$dir";;
 	  esac
-	  case :$dllsearchpath: in
-	  *":$testbindir:"*) ;;
-	  ::) dllsearchpath=$testbindir;;
-	  *) func_append dllsearchpath ":$testbindir";;
+	  case $PATH_SEPARATOR$dllsearchpath$PATH_SEPARATOR in
+	  *$PATH_SEPARATOR$testbindir$PATH_SEPARATOR*) ;;
+	  $PATH_SEPARATOR$PATH_SEPARATOR) dllsearchpath=$testbindir;;
+	  *) func_append dllsearchpath "$PATH_SEPARATOR$testbindir";;
 	  esac
 	  ;;
 	esac
@@ -7921,7 +7929,7 @@ func_mode_link ()
 
     if test -n "$shlibpath_var"; then
       # get the directories listed in $shlibpath_var
-      eval shlib_search_path=\`\$ECHO \"\$$shlibpath_var\" \| \$SED \'s/:/ /g\'\`
+      eval shlib_search_path=\`\$ECHO \"\$$shlibpath_var\" \| \$SED \'s/$PATH_SEPARATOR/ /g\'\`
     else
       shlib_search_path=
     fi
@@ -8549,11 +8557,11 @@ func_mode_link ()
 	    # We need to hardcode the library path
 	    if test -n "$shlibpath_var" && test -z "$avoidtemprpath"; then
 	      # Make sure the rpath contains only unique directories.
-	      case $temp_rpath: in
-	      *"$absdir:"*) ;;
+	      case $temp_rpath$PATH_SEPARATOR in
+	      *"$absdir$PATH_SEPARATOR"*) ;;
               *) case $absdir in
-                 "$progdir/"*) func_append temp_rpath "$absdir:" ;;
-                 *)            func_append temp_rpath_tail "$absdir:" ;;
+                 "$progdir/"*) func_append temp_rpath "$absdir$PATH_SEPARATOR" ;;
+                 *)            func_append temp_rpath_tail "$absdir$PATH_SEPARATOR" ;;
                  esac
 	      esac
 	    fi
@@ -8785,9 +8793,9 @@ func_mode_link ()
 	    fi
 
 	    if test -n "$add_shlibpath"; then
-	      case :$compile_shlibpath: in
-	      *":$add_shlibpath:"*) ;;
-	      *) func_append compile_shlibpath "$add_shlibpath:" ;;
+	      case $PATH_SEPARATOR$compile_shlibpath$PATH_SEPARATOR in
+	      *$PATH_SEPARATOR$add_shlibpath$PATH_SEPARATOR*) ;;
+	      *) func_append compile_shlibpath "$add_shlibpath$PATH_SEPARATOR" ;;
 	      esac
 	    fi
 	    if test prog = "$linkmode"; then
@@ -8799,9 +8807,9 @@ func_mode_link ()
 	      if test yes != "$hardcode_direct" &&
 		 test yes != "$hardcode_minus_L" &&
 		 test yes = "$hardcode_shlibpath_var"; then
-		case :$finalize_shlibpath: in
-		*":$libdir:"*) ;;
-		*) func_append finalize_shlibpath "$libdir:" ;;
+		case $PATH_SEPARATOR$finalize_shlibpath$PATH_SEPARATOR in
+		*$PATH_SEPARATOR$libdir$PATH_SEPARATOR*) ;;
+		*) func_append finalize_shlibpath "$libdir$PATH_SEPARATOR" ;;
 		esac
 	      fi
 	    fi
@@ -8819,9 +8827,9 @@ func_mode_link ()
 	      add_dir=-L$lt_sysroot$libdir
 	      add=-l$name
 	    elif test yes = "$hardcode_shlibpath_var"; then
-	      case :$finalize_shlibpath: in
-	      *":$libdir:"*) ;;
-	      *) func_append finalize_shlibpath "$libdir:" ;;
+	      case $PATH_SEPARATOR$finalize_shlibpath$PATH_SEPARATOR in
+	      *$PATH_SEPARATOR$libdir$PATH_SEPARATOR*) ;;
+	      *) func_append finalize_shlibpath "$libdir$PATH_SEPARATOR" ;;
 	      esac
 	      add=-l$name
 	    elif test yes = "$hardcode_automatic"; then
@@ -9950,7 +9958,7 @@ func_mode_link ()
 	    # We should set the runpath_var.
 	    rpath=
 	    for dir in $perm_rpath; do
-	      func_append rpath "$dir:"
+	      func_append rpath "$dir$PATH_SEPARATOR"
 	    done
 	    eval "$runpath_var='$rpath\$$runpath_var'; export $runpath_var"
 	  fi
@@ -10672,15 +10680,15 @@ func_mode_link ()
 	case $host in
 	*-*-cygwin* | *-*-mingw* | *-*-windows* | *-*-pw32* | *-*-os2* | *-cegcc*)
 	  testbindir=`$ECHO "$libdir" | $SED -e 's*/lib$*/bin*'`
-	  case :$dllsearchpath: in
-	  *":$libdir:"*) ;;
-	  ::) dllsearchpath=$libdir;;
-	  *) func_append dllsearchpath ":$libdir";;
+	  case $PATH_SEPARATOR$dllsearchpath$PATH_SEPARATOR in
+	  *$PATH_SEPARATOR$libdir$PATH_SEPARATOR*) ;;
+	  $PATH_SEPARATOR$PATH_SEPARATOR) dllsearchpath=$libdir;;
+	  *) func_append dllsearchpath "$PATH_SEPARATOR$libdir";;
 	  esac
-	  case :$dllsearchpath: in
-	  *":$testbindir:"*) ;;
-	  ::) dllsearchpath=$testbindir;;
-	  *) func_append dllsearchpath ":$testbindir";;
+	  case $PATH_SEPARATOR$dllsearchpath$PATH_SEPARATOR in
+	  *$PATH_SEPARATOR$testbindir$PATH_SEPARATOR*) ;;
+	  $PATH_SEPARATOR$PATH_SEPARATOR) dllsearchpath=$testbindir;;
+	  *) func_append dllsearchpath "$PATH_SEPARATOR$testbindir";;
 	  esac
 	  ;;
 	esac
@@ -10794,7 +10802,7 @@ func_mode_link ()
 	  # We should set the runpath_var.
 	  rpath=
 	  for dir in $perm_rpath; do
-	    func_append rpath "$dir:"
+	    func_append rpath "$dir$PATH_SEPARATOR"
 	  done
 	  compile_var="$runpath_var=\"$rpath\$$runpath_var\" "
 	fi
@@ -10802,7 +10810,7 @@ func_mode_link ()
 	  # We should set the runpath_var.
 	  rpath=
 	  for dir in $finalize_perm_rpath; do
-	    func_append rpath "$dir:"
+	    func_append rpath "$dir$PATH_SEPARATOR"
 	  done
 	  finalize_var="$runpath_var=\"$rpath\$$runpath_var\" "
 	fi

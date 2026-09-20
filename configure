@@ -5808,9 +5808,6 @@ printf '%s\n' "no" >&6; }
 		PKG_CONFIG=""
 	fi
 fi
-if test -z "$PKG_CONFIG"; then
-	as_fn_error $? "pkg-config not found" "$LINENO" 5
-fi
 
 
 # Check whether --with-dot was given.
@@ -9701,18 +9698,18 @@ func_munge_path_list ()
     case x$2 in
     x)
         ;;
-    *:)
-        eval $1=\"`$ECHO $2 | $SED 's/:/ /g'` \$$1\"
+    *$PATH_SEPARATOR)
+        eval $1=\"`$ECHO $2 | $SED s/$PATH_SEPARATOR/\ /g` \$$1\"
         ;;
-    x:*)
-        eval $1=\"\$$1 `$ECHO $2 | $SED 's/:/ /g'`\"
+    x$PATH_SEPARATOR*)
+        eval $1=\"\$$1 `$ECHO $2 | $SED s/$PATH_SEPARATOR/\ /g`\"
         ;;
-    *::*)
-        eval $1=\"\$$1\ `$ECHO $2 | $SED -e 's/.*:://' -e 's/:/ /g'`\"
-        eval $1=\"`$ECHO $2 | $SED -e 's/::.*//' -e 's/:/ /g'`\ \$$1\"
+    *$PATH_SEPARATOR$PATH_SEPARATOR*)
+        eval $1=\"\$$1\ `$ECHO $2 | $SED -e s/.*$PATH_SEPARATOR$PATH_SEPARATOR// -e s/$PATH_SEPARATOR/\ /g`\"
+        eval $1=\"`$ECHO $2 | $SED -e s/$PATH_SEPARATOR$PATH_SEPARATOR.*// -e s/$PATH_SEPARATOR/\ /g`\ \$$1\"
         ;;
     *)
-        eval $1=\"`$ECHO $2 | $SED 's/:/ /g'`\"
+        eval $1=\"`$ECHO $2 | $SED s/$PATH_SEPARATOR/\ /g`\"
         ;;
     esac
 }
@@ -10530,7 +10527,7 @@ lt_prog_compiler_static=
       lt_prog_compiler_static='-non_shared'
       ;;
 
-    linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu* | *freebsd*)
+    linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu*)
       case $cc_basename in
       # old Intel for x86_64, which still supported -KPIC.
       ecc*)
@@ -11174,17 +11171,17 @@ _LT_EOF
       hardcode_minus_L=yes
       allow_undefined_flag=unsupported
       shrext_cmds=.dll
-      archive_cmds='$ECHO "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
-	$ECHO "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
-	$ECHO "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
-	$ECHO EXPORTS >> $output_objdir/$libname.def~
+      archive_cmds='echo "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
+	echo "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
+	echo "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
+	echo EXPORTS >> $output_objdir/$libname.def~
 	emxexp $libobjs | $SED /"_DLL_InitTerm"/d >> $output_objdir/$libname.def~
 	$CC -Zdll -Zcrtdll -o $output_objdir/$soname $libobjs $deplibs $compiler_flags $output_objdir/$libname.def~
 	emximp -o $lib $output_objdir/$libname.def'
-      archive_expsym_cmds='$ECHO "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
-	$ECHO "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
-	$ECHO "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
-	$ECHO EXPORTS >> $output_objdir/$libname.def~
+      archive_expsym_cmds='echo "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
+	echo "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
+	echo "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
+	echo EXPORTS >> $output_objdir/$libname.def~
 	prefix_cmds="$SED"~
 	if test EXPORTS = "`$SED 1q $export_symbols`"; then
 	  prefix_cmds="$prefix_cmds -e 1d";
@@ -11193,7 +11190,7 @@ _LT_EOF
 	cat $export_symbols | $prefix_cmds >> $output_objdir/$libname.def~
 	$CC -Zdll -Zcrtdll -o $output_objdir/$soname $libobjs $deplibs $compiler_flags $output_objdir/$libname.def~
 	emximp -o $lib $output_objdir/$libname.def'
-      old_archive_from_new_cmds='emximp -o $output_objdir/${libname}_dll.a $output_objdir/$libname.def'
+      #_LT_TAGVAR(old_archive_from_new_cmds, )='emximp -o $output_objdir/${libname}_dll.a $output_objdir/$libname.def'
       enable_shared_with_static_runtimes=yes
       file_list_spec='@'
       ;;
@@ -12051,17 +12048,17 @@ printf '%s\n' "$lt_cv_irix_exported_symbol" >&6; }
       hardcode_minus_L=yes
       allow_undefined_flag=unsupported
       shrext_cmds=.dll
-      archive_cmds='$ECHO "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
-	$ECHO "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
-	$ECHO "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
-	$ECHO EXPORTS >> $output_objdir/$libname.def~
+      archive_cmds='echo "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
+	echo "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
+	echo "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
+	echo EXPORTS >> $output_objdir/$libname.def~
 	emxexp $libobjs | $SED /"_DLL_InitTerm"/d >> $output_objdir/$libname.def~
 	$CC -Zdll -Zcrtdll -o $output_objdir/$soname $libobjs $deplibs $compiler_flags $output_objdir/$libname.def~
 	emximp -o $lib $output_objdir/$libname.def'
-      archive_expsym_cmds='$ECHO "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
-	$ECHO "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
-	$ECHO "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
-	$ECHO EXPORTS >> $output_objdir/$libname.def~
+      archive_expsym_cmds='echo "LIBRARY ${soname%$shared_ext} INITINSTANCE TERMINSTANCE" > $output_objdir/$libname.def~
+	echo "DESCRIPTION \"$libname\"" >> $output_objdir/$libname.def~
+	echo "DATA MULTIPLE NONSHARED" >> $output_objdir/$libname.def~
+	echo EXPORTS >> $output_objdir/$libname.def~
 	prefix_cmds="$SED"~
 	if test EXPORTS = "`$SED 1q $export_symbols`"; then
 	  prefix_cmds="$prefix_cmds -e 1d";
@@ -12070,7 +12067,7 @@ printf '%s\n' "$lt_cv_irix_exported_symbol" >&6; }
 	cat $export_symbols | $prefix_cmds >> $output_objdir/$libname.def~
 	$CC -Zdll -Zcrtdll -o $output_objdir/$soname $libobjs $deplibs $compiler_flags $output_objdir/$libname.def~
 	emximp -o $lib $output_objdir/$libname.def'
-      old_archive_from_new_cmds='emximp -o $output_objdir/${libname}_dll.a $output_objdir/$libname.def'
+      #_LT_TAGVAR(old_archive_from_new_cmds, )='emximp -o $output_objdir/${libname}_dll.a $output_objdir/$libname.def'
       enable_shared_with_static_runtimes=yes
       file_list_spec='@'
       ;;
@@ -13251,9 +13248,14 @@ os2*)
   need_lib_prefix=no
   # OS/2 can only load a DLL with a base name of 8 characters or less.
   soname_spec='`test -n "$os2dllname" && libname="$os2dllname";
-    v=$($ECHO $release$versuffix | tr -d .-);
-    n=$($ECHO $libname | cut -b -$((8 - ${#v})) | tr . _);
-    $ECHO $n$v`$shared_ext'
+    n=$($ECHO $libname | tr -d .-);
+    l=${#n}; test $l -gt 3 && l=3; mr=$((8 - $l));
+    r=$($ECHO $release | tr -d .-);
+    l=${#r}; test $l -gt 2 && l=2; mv=$(($mr - $l));
+    v=$($ECHO $versuffix | tr -d .- | cut -b -$mv);
+    r=$($ECHO $r | cut -b -$(($mr - ${#v})));
+    n=$($ECHO $n | cut -b -$((8 - ${#r} - ${#v})));
+    $ECHO $n$r$v`$shared_ext'
   library_names_spec='${libname}_dll.$libext'
   dynamic_linker='OS/2 ld.exe'
   shlibpath_var=BEGINLIBPATH
@@ -13578,7 +13580,7 @@ lt_prog_compiler_static=
       lt_prog_compiler_static='-non_shared'
       ;;
 
-    linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu* | *freebsd*)
+    linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu*)
       case $cc_basename in
       # old Intel for x86_64, which still supported -KPIC.
       ecc*)
@@ -23105,18 +23107,18 @@ func_munge_path_list ()
     case x$2 in
     x)
         ;;
-    *:)
-        eval $1=\"`$ECHO $2 | $SED 's/:/ /g'` \$$1\"
+    *$PATH_SEPARATOR)
+        eval $1=\"`$ECHO $2 | $SED s/$PATH_SEPARATOR/\ /g` \$$1\"
         ;;
-    x:*)
-        eval $1=\"\$$1 `$ECHO $2 | $SED 's/:/ /g'`\"
+    x$PATH_SEPARATOR*)
+        eval $1=\"\$$1 `$ECHO $2 | $SED s/$PATH_SEPARATOR/\ /g`\"
         ;;
-    *::*)
-        eval $1=\"\$$1\ `$ECHO $2 | $SED -e 's/.*:://' -e 's/:/ /g'`\"
-        eval $1=\"`$ECHO $2 | $SED -e 's/::.*//' -e 's/:/ /g'`\ \$$1\"
+    *$PATH_SEPARATOR$PATH_SEPARATOR*)
+        eval $1=\"\$$1\ `$ECHO $2 | $SED -e s/.*$PATH_SEPARATOR$PATH_SEPARATOR// -e s/$PATH_SEPARATOR/\ /g`\"
+        eval $1=\"`$ECHO $2 | $SED -e s/$PATH_SEPARATOR$PATH_SEPARATOR.*// -e s/$PATH_SEPARATOR/\ /g`\ \$$1\"
         ;;
     *)
-        eval $1=\"`$ECHO $2 | $SED 's/:/ /g'`\"
+        eval $1=\"`$ECHO $2 | $SED s/$PATH_SEPARATOR/\ /g`\"
         ;;
     esac
 }
